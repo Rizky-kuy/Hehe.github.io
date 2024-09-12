@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device and Network Information</title>
+</head>
+<body>
+    <h1>Your Information</h1>
+    <div id="ip-address">IP Address: Fetching...</div>
+    <div id="location">Location: Fetching...</div>
+    <div id="timezone">Timezone: Fetching...</div>
+    <div id="user-agent"></div>
+    
+    <h1>Device Information</h1>
+    <div id="platform"></div>
+    <div id="device-manufacturer">Device Manufacturer: Unknown</div>
+    <div id="device-model">Device Model: Unknown</div>
+    <div id="os"></div>
+    <div id="logical-cpus"></div>
+    <div id="gpu"></div>
+
+    <h1>Network Information</h1>
+    <div id="connection-type"></div>
+    <div id="rtt"></div>
+    <div id="downlink"></div>
+    <div id="max-downlink"></div>
+    <div id="effective-connection-type"></div>
+    <div id="data-saver"></div>
+    
+    <h1>Screen Information</h1>
+    <div id="screen-size"></div>
+    <div id="available-screen"></div>
+    <div id="color-depth"></div>
+    <div id="pixel-depth"></div>
+    <div id="orientation"></div>
+    <div id="dpi"></div>
+    
+    <script>
+        // Fetch public IP using ipify
+        fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("ip-address").innerHTML = "IP Address: " + data.ip;
+        });
+
+        // Fetch location and timezone
+        fetch('https://ipinfo.io/json?token=your_token_here') // Replace with your ipinfo token
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("location").innerHTML = "Location: " + data.city + ", " + data.region + ", " + data.country;
+            document.getElementById("timezone").innerHTML = "Timezone: " + data.timezone;
+        });
+
+        // Get User-Agent and platform info
+        document.getElementById("user-agent").innerHTML = "User Agent: " + navigator.userAgent;
+        document.getElementById("platform").innerHTML = "Platform: " + navigator.platform;
+        document.getElementById("os").innerHTML = "Operating System: " + navigator.platform;
+
+        // Get CPU and GPU info
+        const cpuCount = navigator.hardwareConcurrency;
+        document.getElementById("logical-cpus").innerHTML = "Number of Logical CPUs: " + (cpuCount ? cpuCount : "Unknown");
+
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (gl) {
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            const gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+            const gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+            document.getElementById("gpu").innerHTML = "GPU Vendor: " + gpuVendor + ", Renderer: " + gpuRenderer;
+        } else {
+            document.getElementById("gpu").innerHTML = "GPU: Unknown";
+        }
+
+        // Get network information
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (connection) {
+            document.getElementById("connection-type").innerHTML = "Connection Type: " + connection.type;
+            document.getElementById("rtt").innerHTML = "Round-Trip Time (RTT): " + connection.rtt + " ms";
+            document.getElementById("downlink").innerHTML = "Downlink Speed: " + connection.downlink + " Mbps";
+            document.getElementById("max-downlink").innerHTML = "Max Downlink Speed: " + connection.downlinkMax + " Mbps";
+            document.getElementById("effective-connection-type").innerHTML = "Effective Connection Type: " + connection.effectiveType;
+            document.getElementById("data-saver").innerHTML = "Data Saver Enabled: " + connection.saveData;
+        }
+
+        // Get screen information
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        const availableWidth = window.screen.availWidth;
+        const availableHeight = window.screen.availHeight;
+        const colorDepth = window.screen.colorDepth;
+        const pixelDepth = window.screen.pixelDepth;
+        const orientation = screen.orientation.type;
+
+        document.getElementById("screen-size").innerHTML = "Total Screen Size: " + screenWidth + "x" + screenHeight;
+        document.getElementById("available-screen").innerHTML = "Available Screen Size: " + availableWidth + "x" + availableHeight;
+        document.getElementById("color-depth").innerHTML = "Color Depth: " + colorDepth + " bits";
+        document.getElementById("pixel-depth").innerHTML = "Pixel Depth: " + pixelDepth + " bits";
+        document.getElementById("orientation").innerHTML = "Screen Orientation: " + orientation;
+
+        // Calculate DPI
+        const dpi = window.devicePixelRatio * 96;
+        document.getElementById("dpi").innerHTML = "DPI: " + dpi;
+    </script>
+</body>
+</html>
